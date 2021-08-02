@@ -7,12 +7,9 @@ This is a simple ASP.Net webform page that simplifies testing and experiments wi
 ##Abour Source Code
 It is devided in to sections:
 1. Properties
-2. Page Events
-  Define button click events for Page interations.
-4. AWS Kinesis Video API Calls
-  Calls Kinesis APIs as per the API documentaion.
-5. Helper Funtions
-  For initialisation and Logging purppose.
+2. Page Events : Define button click events for Page interations.
+4. AWS Kinesis Video API Calls : Calls Kinesis APIs as per the API documentaion.
+5. Helper Funtions : For initialisation and Logging purppose.
 
 ## License Summary
 
