@@ -72,6 +72,7 @@ namespace AWS_Kinesis_POC
         {
             SelectedStream = e.CommandArgument.ToString();
             PlayStreamLive(SelectedStream);
+            
         }
 
         protected void BTN_FetchStreams_Click(object sender, EventArgs e)
@@ -89,7 +90,12 @@ namespace AWS_Kinesis_POC
             try
             {
                 Amazon.RegionEndpoint rep = Amazon.RegionEndpoint.GetBySystemName(DDL_Region.SelectedValue);
-                AmazonKinesisVideoClient amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
+                AmazonKinesisVideoClient amazonKinesisVideoClient;
+                if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
+                    amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
+                else
+                    amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, rep);
+
                 ListStreamsRequest listStreamsRequest = new ListStreamsRequest()
                 {
                     MaxResults = 100
@@ -122,7 +128,21 @@ namespace AWS_Kinesis_POC
             try
             {
                 Amazon.RegionEndpoint rep = Amazon.RegionEndpoint.GetBySystemName(DDL_Region.SelectedValue);
-                AmazonKinesisVideoClient amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
+                AmazonKinesisVideoClient amazonKinesisVideoClient;
+                if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
+                    amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
+                else
+                       amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, rep);
+
+                DescribeStreamRequest describeStreamRequest = new DescribeStreamRequest() { StreamName = streamName };
+                DescribeStreamResponse describeStreamResponse = amazonKinesisVideoClient.DescribeStream(describeStreamRequest);
+                LBL_Details.Text = "Name: " + describeStreamResponse.StreamInfo.StreamName + "<br/>"+
+                                   "ARN: " + describeStreamResponse.StreamInfo.StreamARN + "<br/>" +
+                                   "Media Type: " + describeStreamResponse.StreamInfo.MediaType + "<br/>" +
+                                   "Device Name: " + describeStreamResponse.StreamInfo.DeviceName + "<br/>" +
+                                   "Retention (Hours): " + describeStreamResponse.StreamInfo.DataRetentionInHours + "<br/>" +
+                                   "Creation Time: " + describeStreamResponse.StreamInfo.CreationTime;
+
 
                 GetDataEndpointRequest endpointRequest = new GetDataEndpointRequest()
                 {
@@ -132,7 +152,11 @@ namespace AWS_Kinesis_POC
 
                 GetDataEndpointResponse endpointResponse = amazonKinesisVideoClient.GetDataEndpoint(endpointRequest);
 
-                AmazonKinesisVideoArchivedMediaClient amazonkinesisVideoArchivedMediaClient = new AmazonKinesisVideoArchivedMediaClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, endpointResponse.DataEndpoint);
+                AmazonKinesisVideoArchivedMediaClient amazonkinesisVideoArchivedMediaClient;
+                if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
+                    amazonkinesisVideoArchivedMediaClient = new AmazonKinesisVideoArchivedMediaClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, endpointResponse.DataEndpoint);
+                else
+                    amazonkinesisVideoArchivedMediaClient = new AmazonKinesisVideoArchivedMediaClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, endpointResponse.DataEndpoint);
 
                 HLSTimestampRange hLSTimestampRange = new HLSTimestampRange()
                 {
@@ -156,9 +180,8 @@ namespace AWS_Kinesis_POC
                     HLSFragmentSelector = hLSFragmentSelector,
                     ContainerFormat = ContainerFormat.FRAGMENTED_MP4,
                     DiscontinuityMode = HLSDiscontinuityMode.ALWAYS,
-                    DisplayFragmentTimestamp = HLSDisplayFragmentTimestamp.ALWAYS
+                    DisplayFragmentTimestamp = HLSDisplayFragmentTimestamp.ALWAYS,
                     //,MaxMediaPlaylistFragmentResults = 5
-                    ,
                     Expires = expiry
                 };
 
@@ -185,8 +208,11 @@ namespace AWS_Kinesis_POC
             try
             {
                 Amazon.RegionEndpoint rep = Amazon.RegionEndpoint.GetBySystemName(DDL_Region.SelectedValue);
-                AmazonKinesisVideoClient amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
-
+                AmazonKinesisVideoClient amazonKinesisVideoClient;
+                if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
+                    amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
+                else
+                       amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, rep);
                 GetDataEndpointRequest endpointRequest = new GetDataEndpointRequest()
                 {
                     StreamName = streamName,
@@ -194,11 +220,16 @@ namespace AWS_Kinesis_POC
                 };
                 GetDataEndpointResponse endpointResponse = amazonKinesisVideoClient.GetDataEndpoint(endpointRequest);
 
-                AmazonKinesisVideoArchivedMediaClient amazonkinesisVideoArchivedMediaClient = new AmazonKinesisVideoArchivedMediaClient(TB_AccessKeyId.Text,
+                AmazonKinesisVideoArchivedMediaClient amazonkinesisVideoArchivedMediaClient;
+                if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
+                amazonkinesisVideoArchivedMediaClient = new AmazonKinesisVideoArchivedMediaClient(TB_AccessKeyId.Text,
                     TB_SecretAccessKey.Text,
                     TB_SessionToken.Text,
                     endpointResponse.DataEndpoint);
-
+                else
+                    amazonkinesisVideoArchivedMediaClient = new AmazonKinesisVideoArchivedMediaClient(TB_AccessKeyId.Text,
+                    TB_SecretAccessKey.Text,
+                    endpointResponse.DataEndpoint);
                 ClipTimestampRange clipTimestampRange = new ClipTimestampRange()
                 {
                     StartTimestamp = st,

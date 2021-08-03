@@ -27,7 +27,7 @@
   </nav>
             <div class="main">
             <div class="row">
-                <div class="col-3 gx-5">
+                <div class="col-3 gx-5 h-100">
                     <div class="mb-3">
                             <label>Region</label>
                             <asp:DropDownList runat="server" id="DDL_Region" class="form-control form-control-sm">
@@ -54,9 +54,9 @@
                     
                     
                     <h4 style="margin-top: 20px;">Click on a Stream to play.</h4>    
-                    <div class="card bg-light" >
+                    <div class="card bg-light" style="height:300px;" >
                    
-                    <ul class="list-group">
+                    <ul class="list-group overflow-scroll">
                         <asp:Repeater runat="server" DataSource="<%# Streams %>" ID="RepStreams">
                             <ItemTemplate>
                                 <asp:LinkButton runat="server" Text="<%# GetDataItem() %>" OnCommand="LBPlayLive_Command" CommandArgument="<%# GetDataItem() %>" CssClass="list-group-item list-group-item-action" ID="LBPlayLive"></asp:LinkButton>
@@ -134,7 +134,7 @@
                 </div>
                 <div class="col-6 gx-5">
                     <div class="card bg-light">
-                        Details of the Stream
+                        <asp:Label runat="server" ID="LBL_Details"></asp:Label>
                     </div>
                     <div class="row justify-content-center align-items-center">
                         <div>
@@ -145,7 +145,7 @@
                         </div>
                     </div>
                     <h4 style="margin-top: 20px;">Logs</h4>
-                        <div class="card bg-light mb-3">
+                        <div class="card bg-light mb-3 overflow-auto">
                             <asp:Label runat="server" id="PNL_Logs" class="card-body text-monospace" style="font-family: monospace; white-space: pre-wrap;"></asp:Label>
                         </div> 
                 </div>
