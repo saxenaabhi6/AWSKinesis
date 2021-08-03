@@ -11,6 +11,13 @@ It is devided in to sections:
 4. AWS Kinesis Video API Calls : Calls Kinesis APIs as per the API documentaion.
 5. Helper Funtions : For initialisation and Logging purppose.
 
+##What's Next
+1. API Module for SNS Subscription
+2. Stream Creation with Automatic Alarm Creation subscribed to a SNS Topic with an endpoint back to the API above.
+3. Recieve Notifications about Streams.
+4. SignalR to display alerts on the dashboard based on notifications.
+
+
 ## License Summary
 
 This sample code is made available under a modified MIT license. See the LICENSE file.
