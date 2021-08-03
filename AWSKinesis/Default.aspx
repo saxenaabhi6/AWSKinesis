@@ -53,7 +53,7 @@
                         <asp:Button runat="server" ID="BTN_FetchStreams" Text="Fetch Streams" OnClick="BTN_FetchStreams_Click" CssClass=" btn btn-primary"  style="margin-top:10px;"/>
                     
                     
-                    <h4 style="margin-top: 20px;">Click on a Stream to play.</h4>    
+                    <h5 style="margin-top: 20px;">Click on a Stream to play.</h5>    
                     <div class="card bg-light" style="height:300px;" >
                    
                     <ul class="list-group overflow-scroll">
@@ -71,7 +71,7 @@
                     <div class="mb-3">
                             <label>Playback Mode</label>
                         <asp:DropDownList runat="server" ID="DDL_PlaybackMode" CssClass="form-control form-control-sm">
-                            <asp:ListItem Text="Live" Value="LIVE" Selected="True"></asp:ListItem>
+                           <%-- <asp:ListItem Text="Live" Value="LIVE" Selected="True"></asp:ListItem>--%>
                             <asp:ListItem Text="Live Replay" Value="LIVE_REPLAY"></asp:ListItem>
                             <asp:ListItem Text="On Demand" Value="ON_DEMAND"></asp:ListItem>
                         </asp:DropDownList>
@@ -145,7 +145,7 @@
                         </div>
                     </div>
                     <h4 style="margin-top: 20px;">Logs</h4>
-                        <div class="card bg-light mb-3 overflow-auto">
+                        <div class="card bg-light mb-3 overflow-auto" style="height:150px;">
                             <asp:Label runat="server" id="PNL_Logs" class="card-body text-monospace" style="font-family: monospace; white-space: pre-wrap;"></asp:Label>
                         </div> 
                 </div>

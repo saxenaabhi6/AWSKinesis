@@ -136,12 +136,13 @@ namespace AWS_Kinesis_POC
 
                 DescribeStreamRequest describeStreamRequest = new DescribeStreamRequest() { StreamName = streamName };
                 DescribeStreamResponse describeStreamResponse = amazonKinesisVideoClient.DescribeStream(describeStreamRequest);
-                LBL_Details.Text = "Name: " + describeStreamResponse.StreamInfo.StreamName + "<br/>"+
+                LBL_Details.Text = "Name: " + describeStreamResponse.StreamInfo.StreamName + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                   "Retention (Hours): " + describeStreamResponse.StreamInfo.DataRetentionInHours + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
+                                   "Creation Time: " + describeStreamResponse.StreamInfo.CreationTime + "<br/>" +
                                    "ARN: " + describeStreamResponse.StreamInfo.StreamARN + "<br/>" +
-                                   "Media Type: " + describeStreamResponse.StreamInfo.MediaType + "<br/>" +
-                                   "Device Name: " + describeStreamResponse.StreamInfo.DeviceName + "<br/>" +
-                                   "Retention (Hours): " + describeStreamResponse.StreamInfo.DataRetentionInHours + "<br/>" +
-                                   "Creation Time: " + describeStreamResponse.StreamInfo.CreationTime;
+                                   "Media Type: " + describeStreamResponse.StreamInfo.MediaType + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                                   "Device Name: " + describeStreamResponse.StreamInfo.DeviceName;
+                                   
 
 
                 GetDataEndpointRequest endpointRequest = new GetDataEndpointRequest()
@@ -274,12 +275,12 @@ namespace AWS_Kinesis_POC
         public void LogError(string error)
         {
             PNL_Logs.BackColor = System.Drawing.ColorTranslator.FromHtml("#ffcccc");
-            PNL_Logs.Text += "[Error] " + DateTime.Now.ToString() + " : " + error + "\n";
+            PNL_Logs.Text = "<br/>[Error] " + DateTime.Now.ToString() + " : " + error + "\n" + PNL_Logs.Text;
         }
         public void LogInfo(string info)
         {
             PNL_Logs.BackColor = System.Drawing.Color.LightGreen;
-            PNL_Logs.Text += "[Info] " + DateTime.Now.ToString() + " : " + info + "\n";
+            PNL_Logs.Text = "<br/>[Info] " + DateTime.Now.ToString() + " : " + info + "\n" + PNL_Logs.Text;
         }
         #endregion
     }
