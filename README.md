@@ -5,10 +5,10 @@ Amazon Kinesis Video Streams Media Viewer in .Net
 This is a simple ASP.Net webform page that simplifies testing and experiments with HLS output from Amazon Kinesis Video Streams. This is based on the <a href="https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-hls.html">documentation</a>.
 
 ## About Source Code
-It is devided in to sections:
+The code is devided in to following sections:
 1. Properties
 2. Page Events : Define button click events for Page interations.
-4. AWS Kinesis Video API Calls : Calls Kinesis APIs as per the API documentaion.
+4. AWS Kinesis Video API Calls : Collection of all the API Calls to Kinesis.
 5. Helper Funtions : For initialisation and Logging purppose.
 
 ## What's Next
