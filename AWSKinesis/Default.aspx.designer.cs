@@ -58,15 +58,6 @@ namespace AWS_Kinesis_POC {
         protected global::System.Web.UI.WebControls.TextBox TB_SessionToken;
         
         /// <summary>
-        /// TB_Endpoint control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TB_Endpoint;
-        
-        /// <summary>
         /// BTN_FetchStreams control.
         /// </summary>
         /// <remarks>
@@ -83,6 +74,24 @@ namespace AWS_Kinesis_POC {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Repeater RepStreams;
+        
+        /// <summary>
+        /// TB_StreamName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox TB_StreamName;
+        
+        /// <summary>
+        /// BT_CreateStream control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button BT_CreateStream;
         
         /// <summary>
         /// DDL_PlaybackMode control.

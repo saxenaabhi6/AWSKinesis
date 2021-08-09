@@ -27,7 +27,10 @@
   </nav>
             <div class="main">
             <div class="row">
-                <div class="col-3 gx-5 h-100">
+                <div class="col-3 gx-5">
+                    
+                    <h6>1. Connect to AWS.</h6>
+                    <div class="card bg-light p-2">
                     <div class="mb-3">
                             <label>Region</label>
                             <asp:DropDownList runat="server" id="DDL_Region" class="form-control form-control-sm">
@@ -45,33 +48,35 @@
                             <label>AWS Session Token (Optional)</label>
                             <asp:TextBox runat="server" id="TB_SessionToken" type="password" class="form-control form-control-sm" />
                         </div>
-                        <div class="mb-3">
-                            <label>Endpoint (Optional)</label>
-                            <asp:TextBox runat="server" id="TB_Endpoint" type="text" class="form-control form-control-sm" />
-                        </div>
-                  
-                        <asp:Button runat="server" ID="BTN_FetchStreams" Text="Fetch Streams" OnClick="BTN_FetchStreams_Click" CssClass=" btn btn-primary"  style="margin-top:10px;"/>
+                   </div>
+                        <asp:Button runat="server" ID="BTN_FetchStreams" Text="Connect and Fetch Streams" OnClick="BTN_FetchStreams_Click" CssClass=" btn btn-primary mb-5"  style="margin-top:10px;"/>
+                   
                     
-                    
-                    <h5 style="margin-top: 20px;">Click on a Stream to play.</h5>    
+                    <h6>2. Click on a Stream to select.</h6>    
                     <div class="card bg-light" style="height:300px;" >
                    
                     <ul class="list-group overflow-scroll">
                         <asp:Repeater runat="server" DataSource="<%# Streams %>" ID="RepStreams">
                             <ItemTemplate>
-                                <asp:LinkButton runat="server" Text="<%# GetDataItem() %>" OnCommand="LBPlayLive_Command" CommandArgument="<%# GetDataItem() %>" CssClass="list-group-item list-group-item-action" ID="LBPlayLive"></asp:LinkButton>
+                                <asp:LinkButton runat="server" Text="<%# GetDataItem() %>" OnCommand="LBDescribeStream_Command" CommandArgument="<%# GetDataItem() %>" CssClass="list-group-item list-group-item-action" ID="LBPlayLive"></asp:LinkButton>
 
                             </ItemTemplate>
                         </asp:Repeater>
                     </ul>
                         </div>
+                    <div class="input-group">
+                        <asp:TextBox runat="server" ID="TB_StreamName" placeholder="Enter Stream Name" CssClass="form-control form-control-sm"></asp:TextBox>
+                        <asp:Button runat="server" ID="BT_CreateStream" OnClick="BT_CreateStream_Click" CssClass="btn btn-outline-secondary" Text="Create Stream" />
+                    </div>
 
                 </div>
                 <div class="col-3">
+                    <h6>3. Configure Playback Options</h6>
+                    <div class="card bg-light p-2 mb-2">
                     <div class="mb-3">
                             <label>Playback Mode</label>
                         <asp:DropDownList runat="server" ID="DDL_PlaybackMode" CssClass="form-control form-control-sm">
-                           <%-- <asp:ListItem Text="Live" Value="LIVE" Selected="True"></asp:ListItem>--%>
+                            <asp:ListItem Text="Live" Value="LIVE" Selected="True"></asp:ListItem>
                             <asp:ListItem Text="Live Replay" Value="LIVE_REPLAY"></asp:ListItem>
                             <asp:ListItem Text="On Demand" Value="ON_DEMAND"></asp:ListItem>
                         </asp:DropDownList>
@@ -128,7 +133,8 @@
                             <label>Expires (seconds)</label>
                             <asp:TextBox runat="server" id="TB_Expires" type="text" TextMode="Number" class="form-control form-control-sm"/>
                         </div>
-                     <asp:Button runat="server" ID="BTN_playArchive" Text="Play Archive" OnClick="BTN_playArchive_Click" CssClass="btn btn-primary" />
+                    </div>
+                     <asp:Button runat="server" ID="BTN_playArchive" Text="Play Stream" OnClick="BTN_playStream_Click" CssClass="btn btn-primary" />
                         
                             <asp:Button runat="server" ID="BTN_GetClip" Text="Get Clip" OnClick="BTN_GetClip_Click" CssClass="btn btn-primary" />
                 </div>
@@ -139,7 +145,7 @@
                     <div class="row justify-content-center align-items-center">
                         <div>
                             <br />
-                            <video runat="server" id="JsPlayer" class="video-js vjs-default-skin vjs-big-play-centered" style="display: block; margin: 0 auto;" controls="controls" preload="none" height="480" width="720" data-setup='{"techOrder": ["flash", "nativeControlsForTouch": true, "progressControl": false } }'>
+                            <video runat="server" id="JsPlayer" class="video-js vjs-default-skin vjs-big-play-centered" style="display: block; margin: 0 auto;" autoplay="autoplay" controls="controls" preload="none" height="480" width="720" data-setup='{"techOrder": ["flash", "nativeControlsForTouch": true, "progressControl": false } }'>
                                 <source id="source" runat="server" type="application/x-mpegURL" />
                             </video>
                         </div>

@@ -10,6 +10,7 @@ using Amazon.KinesisVideo.Model;
 using Amazon.KinesisVideoArchivedMedia;
 using Amazon.KinesisVideoArchivedMedia.Model;
 using Amazon.KinesisVideoMedia;
+using Amazon.CloudWatch;
 
 namespace AWS_Kinesis_POC
 {
@@ -54,7 +55,7 @@ namespace AWS_Kinesis_POC
         #region Page Events
         protected void PlayStreamLive(string streamName)
         {
-            playStream(streamName, HLSPlaybackMode.LIVE, DateTime.MinValue, DateTime.MinValue);
+            playStream(streamName);
         }
 
         protected void BTN_GetClip_Click(object sender, EventArgs e)
@@ -62,22 +63,27 @@ namespace AWS_Kinesis_POC
             GetClip(SelectedStream, DateTime.Parse(TB_st.Text), DateTime.Parse(TB_et.Text));
         }
 
-        protected void BTN_playArchive_Click(object sender, EventArgs e)
+        protected void BTN_playStream_Click(object sender, EventArgs e)
         {
-            playStream(SelectedStream, HLSPlaybackMode.ON_DEMAND, DateTime.Parse(TB_st.Text), DateTime.Parse(TB_et.Text));
+            playStream(SelectedStream);
         }
 
 
-        protected void LBPlayLive_Command(object sender, CommandEventArgs e)
+        protected void LBDescribeStream_Command(object sender, CommandEventArgs e)
         {
             SelectedStream = e.CommandArgument.ToString();
-            PlayStreamLive(SelectedStream);
+            DescribeStream(SelectedStream);
             
         }
 
         protected void BTN_FetchStreams_Click(object sender, EventArgs e)
         {
             FetchStreams();
+        }
+
+        protected void BT_CreateStream_Click(object sender, EventArgs e)
+        {
+            CreateStream(TB_StreamName.Text, 2);
         }
         #endregion
 
@@ -116,6 +122,25 @@ namespace AWS_Kinesis_POC
             }
         }
 
+        protected void DescribeStream(string streamName)
+        {
+            Amazon.RegionEndpoint rep = Amazon.RegionEndpoint.GetBySystemName(DDL_Region.SelectedValue);
+            AmazonKinesisVideoClient amazonKinesisVideoClient;
+            if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
+                amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
+            else
+                amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, rep);
+
+            DescribeStreamRequest describeStreamRequest = new DescribeStreamRequest() { StreamName = streamName };
+            DescribeStreamResponse describeStreamResponse = amazonKinesisVideoClient.DescribeStream(describeStreamRequest);
+            LBL_Details.Text = "Name: " + describeStreamResponse.StreamInfo.StreamName + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                               "Retention (Hours): " + describeStreamResponse.StreamInfo.DataRetentionInHours + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
+                               "Creation Time: " + describeStreamResponse.StreamInfo.CreationTime + "<br/>" +
+                               "ARN: " + describeStreamResponse.StreamInfo.StreamARN + "<br/>" +
+                               "Media Type: " + describeStreamResponse.StreamInfo.MediaType + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                               "Device Name: " + describeStreamResponse.StreamInfo.DeviceName;
+        }
+
         /// <summary>
         /// Can play stream in both live and archived mode.
         /// </summary>
@@ -123,27 +148,20 @@ namespace AWS_Kinesis_POC
         /// <param name="hLSPlaybackMode"></param>
         /// <param name="st"></param>
         /// <param name="et"></param>
-        protected void playStream(string streamName, HLSPlaybackMode hLSPlaybackMode, DateTime st, DateTime et)
+        protected void playStream(string streamName)
         {
             try
             {
+                HLSPlaybackMode hLSPlaybackMode = (HLSPlaybackMode)DDL_PlaybackMode.SelectedValue;
                 Amazon.RegionEndpoint rep = Amazon.RegionEndpoint.GetBySystemName(DDL_Region.SelectedValue);
+                DateTime st = DateTime.Parse(TB_st.Text);
+                DateTime et = DateTime.Parse(TB_et.Text);
+
                 AmazonKinesisVideoClient amazonKinesisVideoClient;
                 if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
                     amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
                 else
                        amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, rep);
-
-                DescribeStreamRequest describeStreamRequest = new DescribeStreamRequest() { StreamName = streamName };
-                DescribeStreamResponse describeStreamResponse = amazonKinesisVideoClient.DescribeStream(describeStreamRequest);
-                LBL_Details.Text = "Name: " + describeStreamResponse.StreamInfo.StreamName + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                   "Retention (Hours): " + describeStreamResponse.StreamInfo.DataRetentionInHours + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " +
-                                   "Creation Time: " + describeStreamResponse.StreamInfo.CreationTime + "<br/>" +
-                                   "ARN: " + describeStreamResponse.StreamInfo.StreamARN + "<br/>" +
-                                   "Media Type: " + describeStreamResponse.StreamInfo.MediaType + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                                   "Device Name: " + describeStreamResponse.StreamInfo.DeviceName;
-                                   
-
 
                 GetDataEndpointRequest endpointRequest = new GetDataEndpointRequest()
                 {
@@ -179,7 +197,7 @@ namespace AWS_Kinesis_POC
                     StreamName = streamName,
                     PlaybackMode = hLSPlaybackMode,
                     HLSFragmentSelector = hLSFragmentSelector,
-                    ContainerFormat = ContainerFormat.FRAGMENTED_MP4,
+                    ContainerFormat = ContainerFormat.MPEG_TS,
                     DiscontinuityMode = HLSDiscontinuityMode.ALWAYS,
                     DisplayFragmentTimestamp = HLSDisplayFragmentTimestamp.ALWAYS,
                     //,MaxMediaPlaylistFragmentResults = 5
@@ -269,6 +287,55 @@ namespace AWS_Kinesis_POC
 
         }
 
+        protected void CreateStream(string streamName, int retentionInHours)
+        {
+            try
+            {
+                Amazon.RegionEndpoint rep = Amazon.RegionEndpoint.GetBySystemName(DDL_Region.SelectedValue);
+                AmazonKinesisVideoClient amazonKinesisVideoClient;
+                if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
+                    amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
+                else
+                    amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, rep);
+
+                CreateStreamRequest createStreamRequest = new CreateStreamRequest()
+                {
+                    StreamName = streamName,
+                    DataRetentionInHours = retentionInHours
+                };
+
+                CreateStreamResponse createStreamResponse = amazonKinesisVideoClient.CreateStream(createStreamRequest);
+
+                LogInfo(string.Format("Stream Created with ARN: {0}.", createStreamResponse.StreamARN));
+
+                //create cloudwatch alarm for the stream above
+
+                AmazonCloudWatchClient amazonCloudWatchClient = new AmazonCloudWatchClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, rep);
+                amazonCloudWatchClient.PutMetricAlarm(new Amazon.CloudWatch.Model.PutMetricAlarmRequest()
+                {
+                    AlarmName = streamName + "_kvs_up",
+                    ComparisonOperator = Amazon.CloudWatch.ComparisonOperator.GreaterThanOrEqualToThreshold,
+                    MetricName = "PutMedia.ActiveConnections",
+                    Namespace = "AWS/KinesisVideo",
+                    Period = 60,
+                    Statistic = Statistic.Maximum,
+                    Threshold = 1,
+                    ActionsEnabled = true,
+                    AlarmActions = new List<string> { "arn:aws:sns:ap-southeast-2:671473650788:kvs_up" },
+                    TreatMissingData = "missing",
+                    Dimensions = new List<Amazon.CloudWatch.Model.Dimension>(1) { new Amazon.CloudWatch.Model.Dimension { Name = "StreamName", Value = streamName } },
+                    EvaluationPeriods = 1,
+                    DatapointsToAlarm = 1
+                });
+                LogInfo(string.Format("Alarm Created for the stream: {0}.", streamName));
+
+            }
+            catch (Exception ex)
+            {
+                LogError(ex.Message);
+                return;
+            }
+        }
         #endregion
 
         #region Helper Fucntions
@@ -283,5 +350,7 @@ namespace AWS_Kinesis_POC
             PNL_Logs.Text = "<br/>[Info] " + DateTime.Now.ToString() + " : " + info + "\n" + PNL_Logs.Text;
         }
         #endregion
+
+
     }
 }
