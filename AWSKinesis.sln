@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.1209
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWS_Kinesis_POC", "AWSKinesis\AWS_Kinesis_POC.csproj", "{62C35089-901D-4830-B278-2259F20CF8E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{B0238C55-0B26-4F72-B7F7-C429E7203A6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{62C35089-901D-4830-B278-2259F20CF8E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62C35089-901D-4830-B278-2259F20CF8E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62C35089-901D-4830-B278-2259F20CF8E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0238C55-0B26-4F72-B7F7-C429E7203A6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0238C55-0B26-4F72-B7F7-C429E7203A6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0238C55-0B26-4F72-B7F7-C429E7203A6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0238C55-0B26-4F72-B7F7-C429E7203A6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

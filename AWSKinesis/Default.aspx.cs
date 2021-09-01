@@ -11,6 +11,8 @@ using Amazon.KinesisVideoArchivedMedia;
 using Amazon.KinesisVideoArchivedMedia.Model;
 using Amazon.KinesisVideoMedia;
 using Amazon.CloudWatch;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 
 namespace AWS_Kinesis_POC
 {
@@ -39,6 +41,11 @@ namespace AWS_Kinesis_POC
                 initialiseControls();
                 DataBind();
             }
+            //string jsn = "{\"AlarmName\":\"MUSTMVDEVCAM1_kvs_up\",\"AlarmDescription\":null,\"AWSAccountId\":\"671473650788\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 out of the last 1 datapoints [1.0 (02/08/21 01:09:00)] was greater than or equal to the threshold (1.0) (minimum 1 datapoint for OK -> ALARM transition).\",\"StateChangeTime\":\"2021-08-02T01:11:49.272+0000\",\"Region\":\"Asia Pacific (Sydney)\",\"AlarmArn\":\"arn:aws:cloudwatch:ap-southeast-2:671473650788:alarm:MUSTMVDEVCAM1_kvs_up\",\"OldStateValue\":\"OK\",\"Trigger\":{\"MetricName\":\"PutMedia.ActiveConnections\",\"Namespace\":\"AWS/KinesisVideo\",\"StatisticType\":\"Statistic\",\"Statistic\":\"MAXIMUM\",\"Unit\":null,\"Dimensions\":[{\"value\":\"MUSTMVDEVCAM1\",\"name\":\"StreamName\"}],\"Period\":60,\"EvaluationPeriods\":1,\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Threshold\":1.0,\"TreatMissingData\":\"- TreatMissingData:                    missing\",\"EvaluateLowSampleCountPercentile\":\"\"}}";
+            //Newtonsoft.Json.Linq.JObject jo = Newtonsoft.Json.Linq.JObject.Parse(jsn);
+            //string streamName = jo.SelectToken("Trigger.Dimensions[0].value").ToString();
+
+            //string streamName = msg["Trigger"]["Dimensions"][0]["value"];
 
         }
 
@@ -96,6 +103,25 @@ namespace AWS_Kinesis_POC
             try
             {
                 Amazon.RegionEndpoint rep = Amazon.RegionEndpoint.GetBySystemName(DDL_Region.SelectedValue);
+
+                AmazonSimpleNotificationServiceClient amazonSimpleNotificationServiceClient = new AmazonSimpleNotificationServiceClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, rep);
+                CreateTopicRequest createTopicRequest = new CreateTopicRequest()
+                {
+                    Name = "Altitude_UAT_KVS"
+                };
+                CreateTopicResponse createTopicResponse = amazonSimpleNotificationServiceClient.CreateTopic(createTopicRequest);
+                LogInfo("Topic Creation Successful with ARN: " + createTopicResponse.TopicArn);
+
+                SubscribeRequest subscribeRequest = new SubscribeRequest()
+                {
+                    Endpoint = System.Configuration.ConfigurationManager.AppSettings["SNSSubscriptionAPI"],
+                    TopicArn = createTopicResponse.TopicArn,
+                    Protocol = "https"
+                };
+                SubscribeResponse subscribeResponse = amazonSimpleNotificationServiceClient.Subscribe(subscribeRequest);
+                LogInfo("Topic Subsciption Created with ARN: " + subscribeResponse.SubscriptionArn);
+
+
                 AmazonKinesisVideoClient amazonKinesisVideoClient;
                 if (!string.IsNullOrWhiteSpace(TB_SessionToken.Text))
                     amazonKinesisVideoClient = new AmazonKinesisVideoClient(TB_AccessKeyId.Text, TB_SecretAccessKey.Text, TB_SessionToken.Text, rep);
@@ -122,6 +148,10 @@ namespace AWS_Kinesis_POC
             }
         }
 
+        /// <summary>
+        /// We get stream related information from AWS and display it in panel.
+        /// </summary>
+        /// <param name="streamName"></param>
         protected void DescribeStream(string streamName)
         {
             Amazon.RegionEndpoint rep = Amazon.RegionEndpoint.GetBySystemName(DDL_Region.SelectedValue);
@@ -341,13 +371,13 @@ namespace AWS_Kinesis_POC
         #region Helper Fucntions
         public void LogError(string error)
         {
-            PNL_Logs.BackColor = System.Drawing.ColorTranslator.FromHtml("#ffcccc");
-            PNL_Logs.Text = "<br/>[Error] " + DateTime.Now.ToString() + " : " + error + "\n" + PNL_Logs.Text;
+            
+            PNL_Logs.Text = "<div class=\"alert alert-danger\">[Error] " + DateTime.Now.ToString() + " : " + error + "</div>" + PNL_Logs.Text ;
         }
         public void LogInfo(string info)
         {
-            PNL_Logs.BackColor = System.Drawing.Color.LightGreen;
-            PNL_Logs.Text = "<br/>[Info] " + DateTime.Now.ToString() + " : " + info + "\n" + PNL_Logs.Text;
+            
+            PNL_Logs.Text = "<div class=\"alert alert-success\">[Info] " + DateTime.Now.ToString() + " : " + info + "</div>" + PNL_Logs.Text ;
         }
         #endregion
 
