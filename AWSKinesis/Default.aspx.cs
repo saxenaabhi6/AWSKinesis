@@ -32,6 +32,12 @@ namespace AWS_Kinesis_POC
             get { return ViewState["selectedStream"].ToString(); }
             set { ViewState["selectedStream"] = value; }
         }
+
+        public string CreatedTopicARN
+        {
+            get { return ViewState["createdTopicARN"].ToString(); }
+            set { ViewState["createdTopicARN"] = value; }
+        }
         #endregion
 
         protected void Page_Load(object sender, EventArgs e)
@@ -111,6 +117,7 @@ namespace AWS_Kinesis_POC
                 };
                 CreateTopicResponse createTopicResponse = amazonSimpleNotificationServiceClient.CreateTopic(createTopicRequest);
                 LogInfo("Topic Creation Successful with ARN: " + createTopicResponse.TopicArn);
+                CreatedTopicARN = createTopicResponse.TopicArn;
 
                 SubscribeRequest subscribeRequest = new SubscribeRequest()
                 {
@@ -351,7 +358,8 @@ namespace AWS_Kinesis_POC
                     Statistic = Statistic.Maximum,
                     Threshold = 1,
                     ActionsEnabled = true,
-                    AlarmActions = new List<string> { "arn:aws:sns:ap-southeast-2:671473650788:kvs_up" },
+                    AlarmActions = new List<string> { CreatedTopicARN },
+                    OKActions = new List<string> { CreatedTopicARN },
                     TreatMissingData = "missing",
                     Dimensions = new List<Amazon.CloudWatch.Model.Dimension>(1) { new Amazon.CloudWatch.Model.Dimension { Name = "StreamName", Value = streamName } },
                     EvaluationPeriods = 1,

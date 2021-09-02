@@ -41,26 +41,42 @@ namespace WebApi.Controllers
 
             if (snsMessage.IsNotificationType)
             {
+                
                 string msgjson = snsMessage.MessageText;
-
                 Newtonsoft.Json.Linq.JObject jo = Newtonsoft.Json.Linq.JObject.Parse(msgjson);
+                string OldStateValue = jo.SelectToken("OldStateValue").ToString();
+                string NewStateValue = jo.SelectToken("NewStateValue").ToString();
                 string streamName = jo.SelectToken("Trigger.Dimensions[0].value").ToString();
 
-                HttpResponseMessage rm = FireSHubMethod(streamName).GetAwaiter().GetResult();
+                if(OldStateValue == "OK" && NewStateValue == "ALARM")
+                    Task.Run(() => FireSHubMethodAsync(streamName, true)).Wait();
+                if (OldStateValue == "ALARM" && NewStateValue == "OK")
+                    Task.Run(() => FireSHubMethodAsync(streamName, false)).Wait();
 
             }
             return Request.CreateResponse(HttpStatusCode.OK, new { });
         }
 
-        [ActionName("FireSHubMethod")]
+
+        //[ActionName("FireSHubMethod")]
+        //[HttpPost]
+        //public HttpResponseMessage FireSHubMethod(string streamName)
+        //{
+        //    //HttpResponseMessage rm = FireSHubMethodAsync(streamName).GetAwaiter().GetResult();
+        //    Task.Run(() => FireSHubMethodAsync(streamName)).Wait();
+        //    //return rm;
+        //    return new HttpResponseMessage(HttpStatusCode.OK);
+        //}
+
+        [ActionName("FireSHubMethodAsync")]
         [HttpPost]
-        public async Task<HttpResponseMessage> FireSHubMethod(string streamName)
+        public async Task<HttpResponseMessage> FireSHubMethodAsync(string streamName, bool islive)
         {
             using (HubConnection connection = new HubConnection(System.Configuration.ConfigurationManager.AppSettings["WebPortal"]))
             {   
                 IHubProxy notyHubProxy = connection.CreateHubProxy("notyHub");
                 await connection.Start();
-                await notyHubProxy.Invoke("Send", streamName);
+                await notyHubProxy.Invoke("Send", new object[] { streamName, islive });
                 
             }
             return new HttpResponseMessage(HttpStatusCode.OK);

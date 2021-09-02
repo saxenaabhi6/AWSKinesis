@@ -8,9 +8,9 @@ namespace AWSKinesis
 {
     public class notyHub : Hub
     {
-        public void Send(string streamName)
+        public void Send(string streamName, bool isLive)
         {
-            Clients.All.broadcastMessage(streamName);
+            Clients.All.broadcastMessage(streamName, isLive);
         }
     }
 }

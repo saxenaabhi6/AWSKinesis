@@ -26,19 +26,20 @@
 </head>
 <body>
     <script type="text/javascript">  
-var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-        var toastList = toastElList.map(function (toastEl) {
-            return new bootstrap.Toast(toastEl, option)
-        });
 
         $(function () {  
             // Declare a proxy to reference the hub.  
             var notification = $.connection.notyHub;  
-            notification.client.broadcastMessage = function (value) {  
+            notification.client.broadcastMessage = function (value, islive) {  
                 //alert(value);
-                $("#streamName").html(value); $("#toastDate").html(new Date().toLocaleTimeString());
+                $("#streamName").html(value + (islive == true?'is now ONLINE': 'is now OFFLINE'));
+                $("#toastDate").html(new Date().toLocaleTimeString());
+                if(islive == true)
+                    $("#liveToast").removeClass('bg-danger').addClass('bg-success');
+                else
+                    $("#liveToast").removeClass('bg-success').addClass('bg-danger');
                 var myToastEl = document.getElementById('liveToast');
-                var myToast = new bootstrap.Toast(myToastEl);
+                var myToast = new bootstrap.Toast(myToastEl, {autohide: false});
                 myToast.show();
             };  
          
@@ -200,7 +201,7 @@ var toastElList = [].slice.call(document.querySelectorAll('.toast'))
               <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body text-white">
-              <span id="streamName" ></span> is now LIVE.
+              <span id="streamName" ></span>.
             </div>
           </div>
         </div>
